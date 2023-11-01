@@ -8,7 +8,8 @@
 #include <fstream>
 class pirateSpeak{
 public:
-std::string tolower(std::string &s){                                   
+
+std::string tolower(std::string &s) const{                                   
     for (int i = 0; i < s.length();i++){                                        
         s[i] = std::tolower(s[i]);                                              
     }                                                                           
@@ -32,10 +33,17 @@ std::string translate(std::string str) const{
     int index = 0;
     int wordstart = 0;
     std::string ret = str;
-    while (str[index] != NULL){
-        auto word = dict.find(getWord(ret,index));
+    while (ret[index] != '\0'){
+        if (isspace(ret[index])){
+            index++;
+            continue;
+        }
+        std::string gotWord = getWord(ret,index);
+        
+        auto word = dict.find(tolower(gotWord));
+        //std::cout << word->first << " " << word->second << std::endl;
         if (word!=dict.end()){
-            ret.replace(ret.begin()+wordstart, ret.end()-index,word->second);
+            ret.replace(ret.begin()+wordstart, ret.begin()+index,word->second);
         }
     }
     return ret;
@@ -66,7 +74,8 @@ void initDict(){
         }
         //std::cout << pr <<std::endl<< en << std::endl;
         dict.insert(std::pair<std::string, std::string>(en,pr));
-        buff = std::string();
+        en = std::string();
+        pr = std::string();
     }
     std::cout << "dictionary initialized\n";
 }
