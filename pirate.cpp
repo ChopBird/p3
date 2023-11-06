@@ -9,7 +9,7 @@
 class pirateSpeak{
 public:
 
-std::string tolower(std::string &s) const{                                   
+std::string tolower(std::string s) const{                                   
     for (int i = 0; i < s.length();i++){                                        
         s[i] = std::tolower(s[i]);                                              
     }                                                                           
@@ -19,10 +19,11 @@ std::string tolower(std::string &s) const{
 std::string getWord(std::string str, int &start) const{
     std::string ret;
     while(isspace(str[start])) start++;
-    while(start < str.size() && !isspace(str[start])){
+    while(start < str.size() && !isspace(str[start])&&!ispunct(str[start])){
         ret.push_back(str[start]);
         start++;
     }
+
     //eats spaces between words
     
     return ret; 
@@ -34,18 +35,22 @@ std::string translate(std::string str) const{
     int wordstart = 0;
     std::string ret = str;
     while (ret[index] != '\0'){
-        if (isspace(ret[index])){
+        if (isspace(ret[index]) || ispunct(ret[index])){
             index++;
+            wordstart++;
             continue;
         }
         std::string gotWord = getWord(ret,index);
+        auto lookUp = dict.find(tolower(gotWord));
+        auto word = lookUp!=dict.end()?lookUp->second:tolower(gotWord);
         
-        auto word = dict.find(tolower(gotWord));
         //std::cout << word->first << " " << word->second << std::endl;
-        if (word!=dict.end()){
-            ret.replace(ret.begin()+wordstart, ret.begin()+index,word->second);
-        }
+       // if (lookUp!=dict.end()){
+            
+            ret.replace(ret.begin()+wordstart, ret.begin()+index,word);
+        wordstart = index;
     }
+
     return ret;
     
 }
@@ -88,7 +93,11 @@ std::map<std::string,std::string> dict;
 int main(){
     auto p = pirateSpeak();
     p.initDict();
-    std::cout << p.translate("Hello \n");
-
-
+    int i = 0;
+    assert(p.translate("Hello")=="ahoy");
+    assert((p.getWord("hello there you only see the first word",i) == "hello"));
+    assert(p.tolower("ToKi a JAN ale O") == "toki a jan ale o");
+    assert(p.translate("Hello friend have you seen that madame? She was in front of the restroom by the officer") == "ahoy mate have ye seen that proud beauty? she was in front of th' head by th' foul blaggart");
+    auto punctMess = "@#(!%#$#@)";
+    assert(p.translate(punctMess) == punctMess);
 }
