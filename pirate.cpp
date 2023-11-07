@@ -44,6 +44,11 @@ std::string translate(std::string str) const{
         auto lookUp = dict.find(tolower(gotWord));
         auto word = lookUp!=dict.end()?lookUp->second:tolower(gotWord);
         
+        //fixes the capitalization
+        for(int i = 0; i < gotWord.size(); i++){
+        if (i >= word.size()) continue;
+        if (isupper(gotWord[i])) word[i] = toupper(word[i]);
+        }
         //std::cout << word->first << " " << word->second << std::endl;
        // if (lookUp!=dict.end()){
             
@@ -94,10 +99,16 @@ int main(){
     auto p = pirateSpeak();
     p.initDict();
     int i = 0;
-    assert(p.translate("Hello")=="ahoy");
+    //basic sanity test (calso caps)
+    assert(p.translate("Hello")=="Ahoy");
+    //get word test
     assert((p.getWord("hello there you only see the first word",i) == "hello"));
+    // string tolower test
     assert(p.tolower("ToKi a JAN ale O") == "toki a jan ale o");
-    assert(p.translate("Hello friend have you seen that madame? She was in front of the restroom by the officer") == "ahoy mate have ye seen that proud beauty? she was in front of th' head by th' foul blaggart");
+    //Large text test (also caps)
+    assert(p.translate("Hello friend have you seen that madame? She was in front of the restroom by the officer") == "Ahoy mate have ye seen that proud beauty? she was in front of th' head by th' foul blaggart");
+    //punctuation test
     auto punctMess = "@#(!%#$#@)";
     assert(p.translate(punctMess) == punctMess);
 }
+
